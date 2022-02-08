@@ -1,6 +1,6 @@
 specVersion: 0.0.2
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum
     name: TIMEAVAXLP
@@ -17,8 +17,8 @@ dataSources:
         - Pool
       abis:
         - name: TIMEAVAXLP
-          file: ./abis/Contract.json
+          file: TIMEAVAXLP\abis\Contract.json
       eventHandlers:
         - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
           handler: handleSwap
-      file: ./src/mapping.ts
+      file: TIMEAVAXLP\TIMEAVAXLP.wasm
