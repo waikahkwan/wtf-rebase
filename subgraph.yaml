@@ -3,11 +3,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: TIMEAVAXLP
+    name: LP
     network: avalanche
     source:
       address: "0xf64e1c5B6E17031f5504481Ac8145F4c3eab4917"
-      abi: TIMEAVAXLP
+      abi: LP
+      startBlock: 7669051
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -16,8 +17,8 @@ dataSources:
         - Swap
         - Pool
       abis:
-        - name: TIMEAVAXLP
-          file: ./abis/Contract.json
+        - name: LP
+          file: ./abis/LP.json
       eventHandlers:
         - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
           handler: handleSwap
