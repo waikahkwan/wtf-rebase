@@ -1,1 +1,7 @@
+.idea
 node_modules
+generated
+build
+.DS_Store
+.env
+secret.txt
