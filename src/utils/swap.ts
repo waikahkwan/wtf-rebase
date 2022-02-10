@@ -1,7 +1,7 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Pool, Swap, Transaction } from "../../generated/schema";
-import { BIGINT_ZERO, PURCHASE, SELLING } from "../constants/constant";
-import { getPrecision } from "./decimals";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, PURCHASE, SELLING } from "../constants/constant";
+import { toBigInt } from "./decimals";
 
 export function getOrCreateSwap(
     id: string,
@@ -52,15 +52,15 @@ export function assignSwap(
 }
 
 export function calculatePrice (
-    tokenA: BigInt,
-    tokenB: BigInt,
+    tokenA: BigDecimal,
+    tokenB: BigDecimal,
 ): BigInt {
 
-    if(tokenA === BIGINT_ZERO || tokenB === BIGINT_ZERO) {
+    if(tokenA === BIGDECIMAL_ZERO || tokenB === BIGDECIMAL_ZERO) {
         return BIGINT_ZERO;
     }
 
-    let price = tokenA.div(tokenB).times(getPrecision(18));
+    let price = toBigInt(tokenA.div(tokenB), 18);
 
     return price;
 }

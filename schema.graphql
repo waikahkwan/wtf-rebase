@@ -8,18 +8,28 @@ type Swap @entity {
   transaction: Transaction!
   pool: Pool!
   type: String!
-  reserves0: BigInt
-  reserves1: BigInt
-  priceToken0: BigInt
-  priceToken1: BigInt
+  reserves0Raw: BigInt!
+  reserves1Raw: BigInt!
+  reserves0: BigDecimal!,
+  reserves1: BigDecimal!,
+  priceToken0Raw: BigInt!,
+  priceToken1Raw: BigInt!,
+  priceToken0: BigDecimal!,
+  priceToken1: BigDecimal!
+}
+
+type Token @entity { 
+  id: ID!
+  symbol: String!,
+  decimals: BigInt!
 }
 
 type Pool @entity {
   id: ID!
   symbol: String!
   decimals: BigInt!
-  token0: String!
-  token1: String!
+  token0: Token!
+  token1: Token!
 }
 
 type Transaction @entity {

@@ -2,6 +2,7 @@ import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Pool } from "../../generated/schema";
 import { LP } from "../../generated/LP/LP";
 import { BIGINT_ZERO } from "../constants/constant";
+import { getOrCreateToken } from "./token";
 
 export function getOrCreatePool(
     id: string,
@@ -11,30 +12,36 @@ export function getOrCreatePool(
 
     if (pool == null && createIfNotFound) {
         pool = new Pool(id);
-    }
 
-    if (pool != null) {
-        assignPool(pool, "", BIGINT_ZERO, "", "");
-    }
+        let poolContract = LP.bind(Address.fromString(id));
 
-    let poolContract = LP.bind(Address.fromString(id));
-
-    if (poolContract != null) {
         let decimals = poolContract.try_decimals();
         let finalDecimals = !decimals.reverted ? BigInt.fromI32(decimals.value) : BIGINT_ZERO;
 
         let token0 = poolContract.try_token0();
         let finalToken0 = !token0.reverted ? token0.value.toHexString() : "";
 
+        if(finalToken0 != "") {
+            let firstToken = getOrCreateToken(finalToken0);
+            firstToken.save();
+
+            pool.token0 = firstToken.id;
+        }
+
         let token1 = poolContract.try_token1();
         let finalToken1 = !token1.reverted ? token1.value.toHexString() : "";
+
+        if(finalToken1 != "") {
+            let secondToken = getOrCreateToken(finalToken1);
+            secondToken.save();
+
+            pool.token1 = secondToken.id;
+        }
 
         let symbol = poolContract.try_symbol();
         let finalSymbol = !symbol.reverted ? symbol.value : "";
 
-        if (pool !== null) {
-            assignPool(pool, finalSymbol, finalDecimals, finalToken0, finalToken1);
-        }
+        assignPool(pool, finalSymbol, finalDecimals);
     }
 
     return pool as Pool;
@@ -44,13 +51,9 @@ export function assignPool(
     pool: Pool,
     symbol: string,
     decimals: BigInt,
-    token1: string,
-    token0: string
 ) : Pool {
     pool.symbol = symbol;
     pool.decimals = decimals;
-    pool.token1 = token1;
-    pool.token0 = token0;
 
     return pool;
 }
