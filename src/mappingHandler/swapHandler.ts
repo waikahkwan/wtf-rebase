@@ -8,10 +8,17 @@ import { getRouterInfo } from "../utils/router";
 import { getOrCreateSwap, assignSwap, checkIsSellingOrPurchaseToken } from "../utils/swap";
 import { checkTokenBelongsIndex, getAddressForUSDPrice, getOrCreateToken } from "../utils/token";
 import { getOrCreateTransaction, assignTransaction } from "../utils/transaction";
+import { getOrCreateUser } from "../utils/user";
 
 export function swapHandler(event: Swap): void {
   let transactionId = event.transaction.hash.toHexString();
 
+  // Get user
+  let user = getOrCreateUser(
+    event.transaction.from.toHexString(), 
+    event.block.timestamp,
+  );
+  user.save();
 
   // Get Pool
   let poolAddress = event.address.toHexString();
@@ -30,6 +37,7 @@ export function swapHandler(event: Swap): void {
     pool, 
     transactionId
   );
+  swap.user = user.id;
 
    // Create transaction
    let transaction = getOrCreateTransaction(transactionId);
@@ -40,6 +48,7 @@ export function swapHandler(event: Swap): void {
      event.block.number,
      event.block.timestamp
    )
+   transaction.user = user.id;
    transaction.save();
 
 

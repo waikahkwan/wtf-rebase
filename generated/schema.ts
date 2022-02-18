@@ -28,6 +28,7 @@ export class Swap extends Entity {
     this.set("reserves0", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("reserves1", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("transaction", Value.fromString(""));
+    this.set("user", Value.fromString(""));
   }
 
   save(): void {
@@ -248,6 +249,15 @@ export class Swap extends Entity {
   set transaction(value: string) {
     this.set("transaction", Value.fromString(value));
   }
+
+  get user(): string {
+    let value = this.get("user");
+    return value!.toString();
+  }
+
+  set user(value: string) {
+    this.set("user", Value.fromString(value));
+  }
 }
 
 export class Token extends Entity {
@@ -431,6 +441,7 @@ export class Transaction extends Entity {
     this.set("to", Value.fromString(""));
     this.set("blockNumber", Value.fromBigInt(BigInt.zero()));
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("user", Value.fromString(""));
   }
 
   save(): void {
@@ -502,5 +513,76 @@ export class Transaction extends Entity {
 
   set swap(value: Array<string>) {
     this.set("swap", Value.fromStringArray(value));
+  }
+
+  get user(): string {
+    let value = this.get("user");
+    return value!.toString();
+  }
+
+  set user(value: string) {
+    this.set("user", Value.fromString(value));
+  }
+}
+
+export class User extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("createdDate", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save User entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save User entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("User", id.toString(), this);
+    }
+  }
+
+  static load(id: string): User | null {
+    return changetype<User | null>(store.get("User", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get createdDate(): BigInt {
+    let value = this.get("createdDate");
+    return value!.toBigInt();
+  }
+
+  set createdDate(value: BigInt) {
+    this.set("createdDate", Value.fromBigInt(value));
+  }
+
+  get swap(): Array<string> {
+    let value = this.get("swap");
+    return value!.toStringArray();
+  }
+
+  set swap(value: Array<string>) {
+    this.set("swap", Value.fromStringArray(value));
+  }
+
+  get transaction(): Array<string> {
+    let value = this.get("transaction");
+    return value!.toStringArray();
+  }
+
+  set transaction(value: Array<string>) {
+    this.set("transaction", Value.fromStringArray(value));
   }
 }

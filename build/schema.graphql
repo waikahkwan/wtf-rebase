@@ -17,6 +17,7 @@ type Swap @entity {
   test2: String, 
   test3: String,
   transaction: Transaction!
+  user: User!
 }
 
 type Token @entity { 
@@ -44,4 +45,12 @@ type Transaction @entity {
   blockNumber: BigInt!
   timestamp: BigInt!
   swap: [Swap!]! @derivedFrom(field: "transaction")
+  user: User!
+}
+
+type User @entity {
+  id: ID!
+  createdDate: BigInt!
+  swap: [Swap!]! @derivedFrom(field: "user")
+  transaction: [Transaction!]! @derivedFrom(field: "user")
 }
