@@ -21,17 +21,13 @@ export class Swap extends Entity {
     this.set("amount0In", Value.fromBigInt(BigInt.zero()));
     this.set("amount1In", Value.fromBigInt(BigInt.zero()));
     this.set("to", Value.fromBytes(Bytes.empty()));
-    this.set("transaction", Value.fromString(""));
     this.set("pool", Value.fromString(""));
     this.set("type", Value.fromString(""));
     this.set("reserves0Raw", Value.fromBigInt(BigInt.zero()));
     this.set("reserves1Raw", Value.fromBigInt(BigInt.zero()));
     this.set("reserves0", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("reserves1", Value.fromBigDecimal(BigDecimal.zero()));
-    this.set("priceToken0Raw", Value.fromBigInt(BigInt.zero()));
-    this.set("priceToken1Raw", Value.fromBigInt(BigInt.zero()));
-    this.set("priceToken0", Value.fromBigDecimal(BigDecimal.zero()));
-    this.set("priceToken1", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("transaction", Value.fromString(""));
   }
 
   save(): void {
@@ -105,15 +101,6 @@ export class Swap extends Entity {
     this.set("to", Value.fromBytes(value));
   }
 
-  get transaction(): string {
-    let value = this.get("transaction");
-    return value!.toString();
-  }
-
-  set transaction(value: string) {
-    this.set("transaction", Value.fromString(value));
-  }
-
   get pool(): string {
     let value = this.get("pool");
     return value!.toString();
@@ -168,40 +155,98 @@ export class Swap extends Entity {
     this.set("reserves1", Value.fromBigDecimal(value));
   }
 
-  get priceToken0Raw(): BigInt {
-    let value = this.get("priceToken0Raw");
-    return value!.toBigInt();
+  get priceInUSDRaw(): BigInt | null {
+    let value = this.get("priceInUSDRaw");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
   }
 
-  set priceToken0Raw(value: BigInt) {
-    this.set("priceToken0Raw", Value.fromBigInt(value));
+  set priceInUSDRaw(value: BigInt | null) {
+    if (!value) {
+      this.unset("priceInUSDRaw");
+    } else {
+      this.set("priceInUSDRaw", Value.fromBigInt(<BigInt>value));
+    }
   }
 
-  get priceToken1Raw(): BigInt {
-    let value = this.get("priceToken1Raw");
-    return value!.toBigInt();
+  get priceInUSD(): BigDecimal | null {
+    let value = this.get("priceInUSD");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigDecimal();
+    }
   }
 
-  set priceToken1Raw(value: BigInt) {
-    this.set("priceToken1Raw", Value.fromBigInt(value));
+  set priceInUSD(value: BigDecimal | null) {
+    if (!value) {
+      this.unset("priceInUSD");
+    } else {
+      this.set("priceInUSD", Value.fromBigDecimal(<BigDecimal>value));
+    }
   }
 
-  get priceToken0(): BigDecimal {
-    let value = this.get("priceToken0");
-    return value!.toBigDecimal();
+  get test(): BigInt | null {
+    let value = this.get("test");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
   }
 
-  set priceToken0(value: BigDecimal) {
-    this.set("priceToken0", Value.fromBigDecimal(value));
+  set test(value: BigInt | null) {
+    if (!value) {
+      this.unset("test");
+    } else {
+      this.set("test", Value.fromBigInt(<BigInt>value));
+    }
   }
 
-  get priceToken1(): BigDecimal {
-    let value = this.get("priceToken1");
-    return value!.toBigDecimal();
+  get test2(): string | null {
+    let value = this.get("test2");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set priceToken1(value: BigDecimal) {
-    this.set("priceToken1", Value.fromBigDecimal(value));
+  set test2(value: string | null) {
+    if (!value) {
+      this.unset("test2");
+    } else {
+      this.set("test2", Value.fromString(<string>value));
+    }
+  }
+
+  get test3(): string | null {
+    let value = this.get("test3");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set test3(value: string | null) {
+    if (!value) {
+      this.unset("test3");
+    } else {
+      this.set("test3", Value.fromString(<string>value));
+    }
+  }
+
+  get transaction(): string {
+    let value = this.get("transaction");
+    return value!.toString();
+  }
+
+  set transaction(value: string) {
+    this.set("transaction", Value.fromString(value));
   }
 }
 
@@ -331,6 +376,50 @@ export class Pool extends Entity {
   set token1(value: string) {
     this.set("token1", Value.fromString(value));
   }
+
+  get is0Stablecoins(): boolean {
+    let value = this.get("is0Stablecoins");
+    return value!.toBoolean();
+  }
+
+  set is0Stablecoins(value: boolean) {
+    this.set("is0Stablecoins", Value.fromBoolean(value));
+  }
+
+  get is1Stablecoins(): boolean {
+    let value = this.get("is1Stablecoins");
+    return value!.toBoolean();
+  }
+
+  set is1Stablecoins(value: boolean) {
+    this.set("is1Stablecoins", Value.fromBoolean(value));
+  }
+
+  get tokenWithUSDPrice(): string | null {
+    let value = this.get("tokenWithUSDPrice");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set tokenWithUSDPrice(value: string | null) {
+    if (!value) {
+      this.unset("tokenWithUSDPrice");
+    } else {
+      this.set("tokenWithUSDPrice", Value.fromString(<string>value));
+    }
+  }
+
+  get swap(): Array<string> {
+    let value = this.get("swap");
+    return value!.toStringArray();
+  }
+
+  set swap(value: Array<string>) {
+    this.set("swap", Value.fromStringArray(value));
+  }
 }
 
 export class Transaction extends Entity {
@@ -404,5 +493,14 @@ export class Transaction extends Entity {
 
   set timestamp(value: BigInt) {
     this.set("timestamp", Value.fromBigInt(value));
+  }
+
+  get swap(): Array<string> {
+    let value = this.get("swap");
+    return value!.toStringArray();
+  }
+
+  set swap(value: Array<string>) {
+    this.set("swap", Value.fromStringArray(value));
   }
 }

@@ -1,7 +1,6 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { Pool, Swap, Transaction } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, PURCHASE, SELLING } from "../constants/constant";
-import { toBigInt } from "./decimals";
+import { BigInt } from "@graphprotocol/graph-ts";
+import { Pool, Swap } from "../../generated/schema";
+import { BIGINT_ZERO, PURCHASE, SELLING } from "../constants/constant";
 
 export function getOrCreateSwap(
     id: string,
@@ -22,45 +21,55 @@ export function assignSwap(
     amount0Out: BigInt,
     amount1In: BigInt,
     amount1Out: BigInt,
-    transaction: Transaction | null,
-    pool: Pool | null
+    pool: Pool | null, 
+    transactionId: string
 ): Swap {
     swap.amount0In = amount0In;
     swap.amount0Out = amount0Out;
     swap.amount1In = amount1In;
     swap.amount1Out = amount1Out;
-
-    if(transaction != null) {
-        swap.transaction = transaction.id;
-    }
+    swap.transaction = transactionId;
 
     if(pool != null) {
         swap.pool = pool.id
     }
 
-    // Purchase TIME
-    if(amount0In > BIGINT_ZERO && amount1Out > BIGINT_ZERO) {
-        swap.type = PURCHASE;
-    } 
-
-    // Selling TIME
-    if(amount1In > BIGINT_ZERO && amount0Out > BIGINT_ZERO) {
-        swap.type = SELLING;
-    }
-   
     return swap;
 }
 
-export function calculatePrice (
-    tokenA: BigDecimal,
-    tokenB: BigDecimal,
-): BigInt {
+export class ICheckIsSellingOrPurchaseToken {
+    action: String
+    amountIn: BigInt
+    amountOut: BigInt
+}
 
-    if(tokenA === BIGDECIMAL_ZERO || tokenB === BIGDECIMAL_ZERO) {
-        return BIGINT_ZERO;
+export function checkIsSellingOrPurchaseToken(
+    tokenIndex: BigInt,
+    swap: Swap
+): string {
+
+    if(tokenIndex === BigInt.fromI32(0)) {
+        // If token 0 = TIME, token 1 = AVAX, this case = use TIME to purchase AVAX, therefore SELLING
+        if(swap.amount0Out > BIGINT_ZERO && swap.amount1In > BIGINT_ZERO) {
+            return SELLING;
+        }
+
+        // If token 0 = TIME, token 1 = AVAX, this case = use AVAX to purchase TIME, therefore PURCHASE
+        if(swap.amount0In > BIGINT_ZERO && swap.amount1Out > BIGINT_ZERO) {
+            return PURCHASE;
+        }
+
+    } else {
+         // If token 0 = AVAX, token 1 = TIME, this case = use AVAX to purchase TIME, therefore SELLING
+         if(swap.amount0Out > BIGINT_ZERO && swap.amount1In > BIGINT_ZERO) {
+            return PURCHASE;
+        }
+
+        // If token 0 = AVAX, token 1 = TIME, this case = use TIME to purchase AVAX, therefore PURCHASE
+        if(swap.amount0In > BIGINT_ZERO && swap.amount1Out > BIGINT_ZERO) {
+            return SELLING;
+        }
     }
 
-    let price = toBigInt(tokenA.div(tokenB), 18);
-
-    return price;
+    return "";
 }

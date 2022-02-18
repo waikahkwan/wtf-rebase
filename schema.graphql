@@ -5,17 +5,18 @@ type Swap @entity {
   amount0In: BigInt!
   amount1In: BigInt!
   to: Bytes!
-  transaction: Transaction!
   pool: Pool!
   type: String!
   reserves0Raw: BigInt!
   reserves1Raw: BigInt!
   reserves0: BigDecimal!,
-  reserves1: BigDecimal!,
-  priceToken0Raw: BigInt!,
-  priceToken1Raw: BigInt!,
-  priceToken0: BigDecimal!,
-  priceToken1: BigDecimal!
+  reserves1: BigDecimal! 
+  priceInUSDRaw: BigInt,
+  priceInUSD: BigDecimal, 
+  test: BigInt,
+  test2: String, 
+  test3: String,
+  transaction: Transaction!
 }
 
 type Token @entity { 
@@ -30,6 +31,10 @@ type Pool @entity {
   decimals: BigInt!
   token0: Token!
   token1: Token!
+  is0Stablecoins: Boolean,
+  is1Stablecoins: Boolean,
+  tokenWithUSDPrice: String,
+  swap: [Swap!]! @derivedFrom(field: "pool")
 }
 
 type Transaction @entity {
@@ -38,4 +43,5 @@ type Transaction @entity {
   to: String!
   blockNumber: BigInt!
   timestamp: BigInt!
+  swap: [Swap!]! @derivedFrom(field: "transaction")
 }

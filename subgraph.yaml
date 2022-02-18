@@ -2,13 +2,39 @@ specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
+  # - kind: ethereum
+  #   name: TimeAvax
+  #   network: avalanche
+  #   source:
+  #     address: "0xf64e1c5B6E17031f5504481Ac8145F4c3eab4917"
+  #     abi: LP
+  #     startBlock: 7669051
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.5
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - Swap
+  #       - Pool
+  #     abis:
+  #       - name: LP
+  #         file: ./abis/LP.json
+  #       - name: Token
+  #         file: ./abis/Token.json
+  #       - name: Router
+  #         file: ./abis/Router.json
+  #     eventHandlers:
+  #       - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+  #         handler: handleSwap
+  #     file: ./src/mapping.ts
   - kind: ethereum
-    name: LP
+    name: CrownMim
     network: avalanche
     source:
-      address: "0xf64e1c5B6E17031f5504481Ac8145F4c3eab4917"
+      # CROWN <-> MIM
+      address: "0x089a9BF16453b519Fab02e40d143C0dcF9083778" 
       abi: LP
-      startBlock: 7669051
+      startBlock: 9442189
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -21,6 +47,8 @@ dataSources:
           file: ./abis/LP.json
         - name: Token
           file: ./abis/Token.json
+        - name: Router
+          file: ./abis/Router.json
       eventHandlers:
         - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
           handler: handleSwap

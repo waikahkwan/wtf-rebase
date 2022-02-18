@@ -1,8 +1,11 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Pool } from "../../generated/schema";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Pool, Token } from "../../generated/schema";
 import { LP } from "../../generated/LP/LP";
-import { BIGINT_ZERO } from "../constants/constant";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../constants/constant";
 import { getOrCreateToken } from "./token";
+import { Router } from "../../generated/LP/Router";
+import { toDecimal } from "./decimals";
+import { IRouter, Stablecoins } from "../constants/router";
 
 export function getOrCreatePool(
     id: string,
@@ -26,6 +29,10 @@ export function getOrCreatePool(
             firstToken.save();
 
             pool.token0 = firstToken.id;
+
+            // Check token0 is stablecoins
+            let isToken0Stablecoins  = Stablecoins.includes(finalToken0.toLowerCase());
+            pool.is0Stablecoins = isToken0Stablecoins ? true : false;
         }
 
         let token1 = poolContract.try_token1();
@@ -36,6 +43,10 @@ export function getOrCreatePool(
             secondToken.save();
 
             pool.token1 = secondToken.id;
+
+            // Check token1 is stablecoins
+            let isToken1Stablecoins  = Stablecoins.includes(finalToken1.toLowerCase());
+            pool.is1Stablecoins = isToken1Stablecoins ? true : false;
         }
 
         let symbol = poolContract.try_symbol();
@@ -91,3 +102,68 @@ export function getReservesPrice(
 
     return result;
 }
+
+export class PriceInterface  {
+    from: Token
+    to: Token
+    amountInRaw: BigInt
+    amountOutRaw: BigInt
+    amountIn: BigDecimal
+    amountOut: BigDecimal
+}
+
+export function getAmountsOut(
+    routerInfo: IRouter | null,
+    amountInRaw: BigInt, 
+    from: string,
+    to: string
+) : PriceInterface {
+
+    // Create token info
+    let token0 = getOrCreateToken(from);
+    let token1 = getOrCreateToken(to);
+
+    if(routerInfo == null) {
+        return {
+            amountInRaw: BIGINT_ZERO,
+            amountOutRaw: BIGINT_ZERO, 
+            amountIn: BIGDECIMAL_ZERO,
+            amountOut: BIGDECIMAL_ZERO,
+            from: token0,
+            to: token1
+        }
+    }
+
+    // Prepare param for function call
+    let path: Address[] = [Address.fromString(from), Address.fromString(to)];
+   
+    // Create Router Contract
+    let router = Router.bind(Address.fromString(routerInfo.routerAddress));
+    
+
+    let callResult = router.try_getAmountsOut(amountInRaw, path);
+    let finalCallResult = !callResult.reverted
+        ? callResult.value
+        : [];
+
+    // Getting result for function call
+    let amountOutRaw: BigInt = finalCallResult.length > 0
+        ? finalCallResult[1]
+        : BIGINT_ZERO;
+
+    let amountIn = toDecimal(amountInRaw, token0.decimals.toI32());
+    let amountOut = toDecimal(amountOutRaw, token1.decimals.toI32());
+
+
+    let result: PriceInterface = {
+        amountInRaw,
+        amountOutRaw, 
+        amountIn,
+        amountOut,
+        from: token0,
+        to: token1
+    }
+
+    return result;
+}
+
